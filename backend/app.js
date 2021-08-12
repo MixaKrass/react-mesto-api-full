@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const { celebrate, Joi } = require('celebrate');
@@ -39,9 +40,7 @@ const randomString = crypto
   .toString('hex'); // приведём её к строке
 
 console.log(randomString);
-require('dotenv').config();
 
-console.log(process.env.NODE_ENV);
 
 const { PORT = 3000 } = process.env;
 
