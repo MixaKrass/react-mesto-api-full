@@ -5,6 +5,8 @@ const BadReqError = require('../errors/bad-req-err');
 const NotFoundError = require('../errors/not-found-err');
 const NotAuthError = require('../errors/not-auth-err');
 
+const { NODE_ENV, JWT_SECRET } = process.env;
+
 const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.status(200).send(users))
@@ -126,7 +128,7 @@ const login = (req, res, next) => {
             if (!matched) {
               throw new NotAuthError('указан неправильный email или пароль');
             } else {
-              const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' });
+              const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
               res.send({ token });
             }
           })
