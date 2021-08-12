@@ -1,24 +1,82 @@
 import Header from "./Header";
 import Footer from "./Footer";
 import Main from "./Main";
-import {useState } from "react";
+import {Route, Switch, useHistory} from 'react-router-dom';
+import React, { useState, useEffect } from "react";
 import PopupWithForm from "./PopupWithForm";
-import PopupImage from "./PopupImage";
-
-
-
+import ImagePopup from "./ImagePopup";
+import api from "../utils/api";
+import CurrentUserContext from "../contexts/CurrentUserContext";
+import EditProfilePopup from "../components/EditProfilePopup";
+import EditAvatarPopup from "../components/EditAvatarPopup";
+import AddPlacePopup from "./AddPlacePopup";
+import Login from "./Login";
+import Register from "./Register";
+import ProtectedRoute from "./ProtectedRoute";
+import InfoTooltip from "./InfoTooltip";
+import * as auth from "../utils/auth"
+import done from "../images/done.svg";
+import fail from "../images/fail.svg";
 
 function App() {
-  const [isEditProfilePopupOpen ,setIsEditProfilePopupOpen] = useState(false)
-  const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false)
-  const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false)
-  const [selectedCard, setSelectedCard] = useState({ isOpened: false})
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
+  const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
+  const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
+  const [selectedCard, setSelectedCard] = useState({ isOpened: false });
+  const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
+  const [cards, setCards] = useState([]);
+  const [currentUser, setCurrentUser] = useState({});
+  const [userEmail, setUserEmail] = useState('');
+  const [isInfoTooltipOpen, setInfoTooltipOpen] = useState({ opened: false, success: false });
+  const [currentPath, setCurrentPath] = useState('/')
+  const history = useHistory();
+  
+
+ // const done = require('../images/done.svg')
+
+  useEffect(() => {
+    api.getUserInfo()
+    .then((data) => {
+      setCurrentUser(data)
+    })
+    .catch(e => console.log(e))
+  }, [])
+
+  useEffect(() => {
+    api.getInitialCards()
+    .then((data) => {
+      setCards(data)
+    }) 
+    .catch(err => console.log(err))
+  }, [])
+
+  function handleCardLike(card) {
+    // Снова проверяем, есть ли уже лайк на этой карточке
+    const isLiked = card.likes.some(i => i._id === currentUser._id);
+    
+    // Отправляем запрос в API и получаем обновлённые данные карточки
+    api.changeLikeCardStatus(card._id, isLiked).then((newCard) => {
+        setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
+    })
+    .catch(err => console.log(err));
+} 
+
+
+    // удаление карточки
+    const handleCardDelete = (card) => {
+    api.removeCard(card._id)
+    .then(() => {
+      setCards(state => state.filter(c => c._id !== card._id))
+   })
+   .catch(err => console.log(err));
+  }
 
   //обработчик картинки
-  const handleCardClick = ({link, name, isOpened}) => {
-    setSelectedCard({link, name, isOpened: !isOpened})
+  const handleCardClick = ({ link, name, isOpened }) => {
+    setSelectedCard({ link, name, isOpened: !isOpened })
   }
- 
+
 
   // обработчики попапов (open/close)
   const handleEditAvatarClick = () => {
@@ -30,51 +88,179 @@ function App() {
   const handleAddPlaceClick = () => {
     setIsAddPlacePopupOpen(!isAddPlacePopupOpen)
   }
-  
-  const closeAllPopups = () => {
-    setIsEditAvatarPopupOpen (false)
-    setIsEditProfilePopupOpen (false)
-    setIsAddPlacePopupOpen (false)
-    setSelectedCard({ isOpened: false})
+  const handleConfirmPopupClick = () => {
+    setIsConfirmPopupOpen(!isConfirmPopupOpen)
   }
 
+  const closeAllPopups = () => {
+    setIsEditAvatarPopupOpen(false)
+    setIsEditProfilePopupOpen(false)
+    setIsAddPlacePopupOpen(false)
+    setSelectedCard({ isOpened: false })
+    setIsConfirmPopupOpen(false)
+    setInfoTooltipOpen({ opened: false, success: false})
+  }
+
+  // обработчик информации о пользователе
+  const handleUpdateUser = (userData) => {
+    api.patchProfileInfo(userData)
+    .then((data) => {
+      setCurrentUser(data)
+      closeAllPopups()
+    })
+    .catch(err => console.log(err));
+  }
+
+  // обновление аватара
+  const handleUpdateAvatar = (newAvatar) => {
+    api.newAvatar(newAvatar)
+    .then((data) => {
+      setCurrentUser(data)
+      closeAllPopups()
+    })
+    .catch(err => console.log(err));
+  }
+
+// добавление карточки
+  const handleAddPlace = (data) => {
+    api.patchCard(data)
+    .then(newCard => {
+      setCards([newCard, ...cards])
+      closeAllPopups()
+    })
+    .catch(err => console.log(err));
+  }
+ const handlePathChange = (newPath) => {
+  setCurrentPath(newPath);
+ }
+
+ 
+  //проверка токена
+  React.useEffect(() => {
+    auth.tokenCheck(localStorage.getItem('token'))
+    .then(result => {
+      if (result) {
+        setUserEmail(result.data.email);
+        setLoggedIn(true);
+        history.push('/');
+        setCurrentPath('/');
+      } else {
+        throw new Error ('Ошибка текущего сеанса. Необходимо заново авторизироваться')
+      }
+    })
+    .catch (err => {
+      console.log(`Ошибка входа по токену ${err}`);
+      history.push('/sign-in');
+    })
+  }, [])
+  
+
+  // обработчик завершения
+ const handleLogout = () => {
+   localStorage.removeItem('token');
+   setUserEmail('');
+   setLoggedIn(false);
+   history.push('/sign-in');
+   setCurrentPath('/sign-in');
+ }
+
+  //обработчик регистрации
+  const handleSignupSubmit = (email, password) => {
+    auth.register (email, password)
+    .then(result => {
+      if (result) {
+        setUserEmail(result.data.email);
+        setInfoTooltipOpen({ opened: true, success: true })
+        setLoggedIn(true);
+        history.push('/');
+        setCurrentPath('/');
+      }
+      else {
+        throw new Error('Не удалось пройти регистрацию');
+      }
+    })
+    .catch( err => {
+    console.log(`Ошибка регистрацииЖ ${err}`);
+    setInfoTooltipOpen({ opened: true, success: false })
+  })
+}
+ 
+  //обработчик авторизации
+  const handleSigninSubmit = (email, password) => {
+    auth.authorization (email, password)
+    .then(data => {
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        setUserEmail(email);
+        setLoggedIn(true);
+        history.push('/');
+        setCurrentPath('/');
+      }
+      else {
+        throw new Error('Не удалось получить токен от сервера');
+      }
+    })
+    .catch( err => {
+      console.log(alert(`Ошибка авторизацииЖ ${err}. Проверьте корректность данных`))
+  })
+  }
+  
+
   return (
-<div className="body">
-  <div className="page">
-    <Header />
-      < Main 
-        onEditAvatar={handleEditAvatarClick}
-        onEditProfile={handleEditProfileClick}
-        onAddPlace={handleAddPlaceClick}
-        onCardClick={handleCardClick}
-      />       
-    <Footer />
-  </div>
+    <CurrentUserContext.Provider value={currentUser}>
+    <div className="body">
+      <div className="page">
+        <Header 
+        userEmail={userEmail}
+        onLogout={handleLogout}
+        path={currentPath} />
 
-    <PopupWithForm
-      name="edit" title="Редактировать профиль" isOpen={isEditProfilePopupOpen} container="popup__container popup__form" onClose={closeAllPopups}>
-      <input type="text" className="popup__input" name="input-name" id="input__popup-name" minLength="2" maxLength="40"  placeholder="Имя" required />
-        <span id="input__popup-name-error" className="popup__error" />
-        <input type="text" className="popup__input" name="input-about" id="input__popup-about" minLength="2" maxLength="200" placeholder="Вид деятельности" required />
-        <span id="input__popup-about-error" className="popup__error" />
-    </PopupWithForm>
+        <Switch>
+        <Route path='/sign-in'>
+          <Login onSignin={handleSigninSubmit} onPathChange={handlePathChange}/>
+        </Route>
+        <Route path='/sign-up'>
+          <Register onSignup={handleSignupSubmit} onPathChange={handlePathChange} />
+        </Route>
+        <ProtectedRoute path='/' 
+          loggedIn={loggedIn}
+          component={Main}
+          onEditAvatar={handleEditAvatarClick}
+          onEditProfile={handleEditProfileClick}
+          onCardClick={handleCardClick}
+          onCardLike={handleCardLike}
+          cards={cards}
+          onConfirmPopup={handleConfirmPopupClick}
+          onCardDelete={handleCardDelete}
+          onAddPlace={handleAddPlaceClick}
+          
+        />
+        
+        </Switch>
+        <Footer />
+      </div>
 
-    <PopupWithForm
-      name="add" title="Новое место" isOpen={isAddPlacePopupOpen} container="popup__container popup__form" onClose={closeAllPopups}>
-      <input name="InputNameCard" type="text" id="input__popup-CardName" className="popup__input" placeholder="Название места" minLength="2" maxLength="40" required />
-      <span id="input__popup-CardName-error" className="popup__error" />
-      <input type="url" className="popup__input" name="InputImgCard" id="input__popup-CardImg" placeholder="ссылка на картинку" required />
-      <span id="input__popup-CardImg-error" className="popup__error" />
-    </PopupWithForm>
+      <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser} />
+     
 
-    <PopupWithForm 
-      name="refresh" title="Обновить аватар" isOpen={isEditAvatarPopupOpen} container="popup__container popup__form" onClose={closeAllPopups}>
-      <input type="url" className="popup__input" name="avatar"  id="input__popup-avatar"  placeholder="Ссылка на аватар" required />
-      <span id="input__popup-avatar-error" className="popup__error" />
-    </PopupWithForm>
+      <AddPlacePopup isOpen={isAddPlacePopupOpen}  onClose={closeAllPopups} onAddPlace={handleAddPlace} > </AddPlacePopup>
 
-    <PopupImage onClose={closeAllPopups} card={selectedCard} />
-  </div>
+      <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar} > </EditAvatarPopup>
+
+      <PopupWithForm
+        name="sure" title="Вы уверены?" isOpen={isConfirmPopupOpen} container="popup__container popup__form" onClose={closeAllPopups} >
+
+      </PopupWithForm>
+
+
+      <ImagePopup onClose={closeAllPopups} card={selectedCard} />
+      <InfoTooltip
+        isOpen={isInfoTooltipOpen.opened} 
+        onClose={closeAllPopups}
+        statusImage={isInfoTooltipOpen.success ? done : fail} 
+        title={isInfoTooltipOpen.success ? 'Вы успешно зарегистрировались!':'Что-то пошло не так! Попробуйте ещё раз'} />
+    </div>
+    </CurrentUserContext.Provider>
   );
 }
 

@@ -1,20 +1,16 @@
 import close from '../images/popup/Close_Icon.svg';
 
-const PopupConfirm = () => {
+const PopupConfirm = ({isOpen, onClose, container}) => {
   
   return(
-    <div className="popup popup_confirm">
-      <form id='form_remove' 
-      className = "popup__container">
-        <h2 className = "popup__title">Вы Уверены</h2>
-        <button type = "submit" className = "popup__button" >Да</button>
+    <div className={isOpen ? `popup popup_confirm popup_opened` : `popup popup_confirm` }>
+      <form id='form_remove' className ={container}>
+        <h2 className="popup__title">Вы Уверены</h2>
+        <button type ="submit" className="popup__button" >Да</button>
       </form>
-      <button 
-        type = "button"
-        id = "close_remove"
-        className = "popup__closed">
-          <img className = " " src = {close} alt="закрыть" />
-        </button>
+      <button  src = {close} alt="закрыть" type="button" id="close_remove" className="popup__closed" onClick={onClose}>
+      
+      </button>
     </div>
 
   )

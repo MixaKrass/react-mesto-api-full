@@ -53,49 +53,38 @@ class Api {
     .then(this._checkError);
   }
 
-  // ставим лайк 
-  putLike(cardId) {
-    const newConfing = {
+  // ставим и удаляем лайк 
+  changeLikeCardStatus(cardId, isLiked) {
+    const updateLike = {
       headers: this._headers,
       method: 'PUT', 
     }
-    return fetch(`https://mesto.nomoreparties.co/v1/cohort-23/cards/likes/${cardId}`, newConfing)
-    .then(this._checkError);
-  }
-
-  // удаляем лайк
-  removeLike(cardId) {
-    const newConfing = {
+   
+    const deleteLike = {
       headers: this._headers,
       method: 'DELETE', 
     }
-    return fetch(`https://mesto.nomoreparties.co/v1/cohort-23/cards/likes/${cardId}`, newConfing)
+    return fetch(`https://mesto.nomoreparties.co/v1/cohort-23/cards/likes/${cardId}`, isLiked ? deleteLike : updateLike)
     .then(this._checkError);
   }
 
   // отправляем информацию 
-  patchProfileInfo(data) {
+  patchProfileInfo(userData) {
     const newConfing = {
       method: 'PATCH',
       headers: this._headers,
-      body: JSON.stringify({
-        name: data['input-name'],
-        about: data['input-about']
-      }),
+      body: JSON.stringify(userData),
     }
     return fetch('https://mesto.nomoreparties.co/v1/cohort-23/users/me', newConfing)
     .then(this._checkError);
   }
 
-  //отправляем информацию о пользователе на сервер
-  patchCard(data) {
+  //отправляем информацию о фото и пользователе на сервер
+  patchCard(inputsValue) {
     const newConfing = {
       method: 'POST',
       headers: this._headers,
-      body: JSON.stringify({
-        name: data['InputNameCard'],
-        link: data['InputImgCard']
-      }),
+      body: JSON.stringify(inputsValue),
       
   }
   return fetch('https://mesto.nomoreparties.co/v1/cohort-23/cards', newConfing)
