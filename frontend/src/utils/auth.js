@@ -1,4 +1,4 @@
-const BASE_URL = 'https://auth.nomoreparties.co';
+const BASE_URL = 'https://api.mixakras.nomoredomains.club';
 
 export const register = (email, password) => {
   return fetch(`${BASE_URL}/signup`, {
@@ -30,7 +30,7 @@ export const authorization = (email, password) => {
   })
 }
 
-export const tokenCheck = (token) => { 
+export const tokenCheck = (token) => {
   return fetch(`${BASE_URL}/users/me`, {
     method: 'GET',
     headers: {"Content-Type": "application/json",

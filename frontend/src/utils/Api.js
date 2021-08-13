@@ -1,6 +1,7 @@
 class Api {
-  constructor(confing) {
+  constructor(confing, {baseUrl} ) {
     this._headers = confing.headers
+    this._baseUrl = baseUrl
   }
 
   _checkError(res) {
@@ -18,18 +19,18 @@ class Api {
     })
     .then(this._checkError);
   }
- 
+
 
   //получаем информацию пользователя
   getUserInfo() {
-    return fetch('https://mesto.nomoreparties.co/v1/cohort-23/users/me', {
+    return fetch(`${this._baseUrl}/users/me`, {
       method: 'GET',
       headers: this._headers
     })
     .then(this._checkError);
   }
 
-  //обновляем аватар 
+  //обновляем аватар
   newAvatar(avatarUrl) {
     const newConfing = {
       method: 'PATCH',
@@ -37,9 +38,9 @@ class Api {
       body: JSON.stringify({
         avatar: avatarUrl['avatar']
       }),
-      
+
     }
-    return fetch(`https://mesto.nomoreparties.co/v1/cohort-23/users/me/avatar`, newConfing)
+    return fetch(`${this._baseUrl}/users/me/avatar`, newConfing)
     .then(this._checkError);
   }
 
@@ -49,53 +50,53 @@ class Api {
       headers: this._headers,
       method: 'DELETE',
     }
-    return fetch(`https://mesto.nomoreparties.co/v1/cohort-23/cards/${cardId}`, newConfing)
+    return fetch(`${this._baseUrl}/cards/${cardId}`, newConfing)
     .then(this._checkError);
   }
 
-  // ставим и удаляем лайк 
+  // ставим и удаляем лайк
   changeLikeCardStatus(cardId, isLiked) {
     const updateLike = {
       headers: this._headers,
-      method: 'PUT', 
+      method: 'PUT',
     }
-   
+
     const deleteLike = {
       headers: this._headers,
-      method: 'DELETE', 
+      method: 'DELETE',
     }
-    return fetch(`https://mesto.nomoreparties.co/v1/cohort-23/cards/likes/${cardId}`, isLiked ? deleteLike : updateLike)
+    return fetch(`${this._baseUrl}/cards/${cardId}/likes`, isLiked ? deleteLike : updateLike)
     .then(this._checkError);
   }
 
-  // отправляем информацию 
+  // отправляем информацию
   patchProfileInfo(userData) {
     const newConfing = {
       method: 'PATCH',
       headers: this._headers,
       body: JSON.stringify(userData),
     }
-    return fetch('https://mesto.nomoreparties.co/v1/cohort-23/users/me', newConfing)
+    return fetch(`${this._baseUrl}/users/me`, newConfing)
     .then(this._checkError);
   }
 
-  //отправляем информацию о фото и пользователе на сервер
+  //создание карточки
   patchCard(inputsValue) {
     const newConfing = {
       method: 'POST',
       headers: this._headers,
       body: JSON.stringify(inputsValue),
-      
+
   }
-  return fetch('https://mesto.nomoreparties.co/v1/cohort-23/cards', newConfing)
+  return fetch(`${this._baseUrl}/cards`, newConfing)
   .then(this._checkError);
 }
 }
 
 export default new Api ({
-  baseUrl: `https://mesto.nomoreparties.co/v1/cohort-23`,
+  baseUrl: `https://mixakras.nomoredomains.club`,
   headers: {
-    authorization: '59355a13-0455-44b4-82be-0f2dacf9df5d',
+    authorization: `Bearer ${localStorage.getItem('token')}`,
     'Content-Type': 'application/json'
   }
 });
