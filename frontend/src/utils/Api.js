@@ -94,7 +94,7 @@ class Api {
 }
 
 export default new Api ({
-  baseUrl: `https://api.mixakras.nomoredomains.club`,
+  baseUrl: `https://mixakras.nomoredomains.club`,
   headers: {
     authorization: `Bearer ${localStorage.getItem('token')}`,
     'Content-Type': 'application/json'
