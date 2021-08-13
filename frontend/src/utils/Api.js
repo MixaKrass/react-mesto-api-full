@@ -1,6 +1,7 @@
 class Api {
   constructor(confing) {
     this._headers = confing.headers
+    this._baseUrl= confing.baseUrl
   }
 
   _checkError(res) {

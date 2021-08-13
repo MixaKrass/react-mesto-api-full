@@ -8,7 +8,6 @@ const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
-
 const allowedCors = [
   'https://praktikum.tk',
   'http://praktikum.tk',
