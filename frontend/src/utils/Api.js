@@ -82,10 +82,12 @@ class Api {
 
   //создание карточки
   patchCard(inputsValue) {
+    console.log(inputsValue)
+    console.log(JSON.stringify(inputsValue.name, inputsValue.link))
     const newConfing = {
       method: 'POST',
       headers: this._headers,
-      body: JSON.stringify(inputsValue),
+      body: JSON.stringify(inputsValue.name, inputsValue.link),
 
   }
   return fetch(`${this._baseUrl}/cards`, newConfing)
