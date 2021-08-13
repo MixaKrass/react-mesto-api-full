@@ -13,7 +13,7 @@ class Api {
 
   //получаем список всех карточек
   getInitialCards() {
-    return fetch('https://mesto.nomoreparties.co/v1/cohort-23/cards', {
+    return fetch(`${this._baseUrl}/cards`, {
       method: 'GET',
       headers: this._headers
     })
@@ -94,7 +94,7 @@ class Api {
 }
 
 export default new Api ({
-  baseUrl: `https://mixakras.nomoredomains.club`,
+  baseUrl: `https://api.mixakras.nomoredomains.club`,
   headers: {
     authorization: `Bearer ${localStorage.getItem('token')}`,
     'Content-Type': 'application/json'

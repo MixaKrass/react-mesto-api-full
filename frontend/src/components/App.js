@@ -31,7 +31,7 @@ function App() {
   const [isInfoTooltipOpen, setInfoTooltipOpen] = useState({ opened: false, success: false });
   const [currentPath, setCurrentPath] = useState('/')
   const history = useHistory();
-  
+
 
  // const done = require('../images/done.svg')
 
@@ -47,20 +47,20 @@ function App() {
     api.getInitialCards()
     .then((data) => {
       setCards(data)
-    }) 
+    })
     .catch(err => console.log(err))
   }, [])
 
   function handleCardLike(card) {
     // Снова проверяем, есть ли уже лайк на этой карточке
     const isLiked = card.likes.some(i => i._id === currentUser._id);
-    
+
     // Отправляем запрос в API и получаем обновлённые данные карточки
     api.changeLikeCardStatus(card._id, isLiked).then((newCard) => {
         setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
     })
     .catch(err => console.log(err));
-} 
+}
 
 
     // удаление карточки
@@ -134,7 +134,7 @@ function App() {
   setCurrentPath(newPath);
  }
 
- 
+
   //проверка токена
   React.useEffect(() => {
     auth.tokenCheck(localStorage.getItem('token'))
@@ -153,7 +153,7 @@ function App() {
       history.push('/sign-in');
     })
   }, [])
-  
+
 
   // обработчик завершения
  const handleLogout = () => {
@@ -184,7 +184,7 @@ function App() {
     setInfoTooltipOpen({ opened: true, success: false })
   })
 }
- 
+
   //обработчик авторизации
   const handleSigninSubmit = (email, password) => {
     auth.authorization (email, password)
@@ -204,13 +204,13 @@ function App() {
       console.log(alert(`Ошибка авторизацииЖ ${err}. Проверьте корректность данных`))
   })
   }
-  
+
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
     <div className="body">
       <div className="page">
-        <Header 
+        <Header
         userEmail={userEmail}
         onLogout={handleLogout}
         path={currentPath} />
@@ -222,7 +222,7 @@ function App() {
         <Route path='/sign-up'>
           <Register onSignup={handleSignupSubmit} onPathChange={handlePathChange} />
         </Route>
-        <ProtectedRoute path='/' 
+        <ProtectedRoute path='/'
           loggedIn={loggedIn}
           component={Main}
           onEditAvatar={handleEditAvatarClick}
@@ -233,15 +233,15 @@ function App() {
           onConfirmPopup={handleConfirmPopupClick}
           onCardDelete={handleCardDelete}
           onAddPlace={handleAddPlaceClick}
-          
+
         />
-        
+
         </Switch>
         <Footer />
       </div>
 
       <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser} />
-     
+
 
       <AddPlacePopup isOpen={isAddPlacePopupOpen}  onClose={closeAllPopups} onAddPlace={handleAddPlace} > </AddPlacePopup>
 
@@ -255,9 +255,9 @@ function App() {
 
       <ImagePopup onClose={closeAllPopups} card={selectedCard} />
       <InfoTooltip
-        isOpen={isInfoTooltipOpen.opened} 
+        isOpen={isInfoTooltipOpen.opened}
         onClose={closeAllPopups}
-        statusImage={isInfoTooltipOpen.success ? done : fail} 
+        statusImage={isInfoTooltipOpen.success ? done : fail}
         title={isInfoTooltipOpen.success ? 'Вы успешно зарегистрировались!':'Что-то пошло не так! Попробуйте ещё раз'} />
     </div>
     </CurrentUserContext.Provider>
