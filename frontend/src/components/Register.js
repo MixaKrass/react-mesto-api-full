@@ -19,6 +19,7 @@ function Register (props) {
     handlePathChange('/sign-un')
   }, []);
 
+
   return (
     <div>
     <form className="form" onSubmit={handleSubmit}>
