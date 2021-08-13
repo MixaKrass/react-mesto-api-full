@@ -4,14 +4,14 @@ import { useContext } from "react";
 const Card = ({ card, onCardClick, onCardLike, onCardDelete}) => {
   const currentUser = useContext(CurrentUserContext)
 
-  
+
 
   const handleClick = () => {
     onCardClick(card)
   }
 
   const handleLikeClick = () => {
-    onCardLike(card)
+    onCardLike(card, isLiked)
     console.log ("world")
   }
 
@@ -20,18 +20,18 @@ const Card = ({ card, onCardClick, onCardLike, onCardDelete}) => {
   }
 
   // проверка своей карточки
-  const isOwn = card.owner._id === currentUser._id;
-  const isLiked = card.likes.some(i => i._id === currentUser._id)
+  const isOwn = card.owner === currentUser._id;
+  const isLiked = card.likes.find(i => i === currentUser._id)
 
   // Создаём переменную, которую после зададим в `className` для кнопки удаления
     const cardDeleteButtonClassName = (
       `card__delete ${isOwn ? 'card__delete_my' : ''}`
     );
-    
+
   // Создаём переменную, которую после зададим в `className` для кнопки лайка
     const cardLikeButtonClassName = (
       `card__like ${isLiked ? 'card__like_active' : ''}`
-    );   
+    );
 
 
   return (
