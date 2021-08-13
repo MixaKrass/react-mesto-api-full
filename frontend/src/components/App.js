@@ -37,7 +37,8 @@ function App() {
  // const done = require('../images/done.svg')
 
   useEffect(() => {
-    api.getUserInfo()
+    const token = localStorage.getItem('jwt');
+    api.getUserInfo(token)
     .then((data) => {
       setCurrentUser(data)
     })
@@ -45,7 +46,8 @@ function App() {
   }, [])
 
   useEffect(() => {
-    api.getInitialCards()
+    const token = localStorage.getItem('jwt');
+    api.getInitialCards(token)
     .then((data) => {
       setCards(data)
     })
@@ -54,7 +56,7 @@ function App() {
 
   function handleCardLike(card) {
     // Снова проверяем, есть ли уже лайк на этой карточке
-    const isLiked = card.likes.some(i => i._id === currentUser._id);
+    const isLiked = card.likes.find(i => i === currentUser._id);
 
     // Отправляем запрос в API и получаем обновлённые данные карточки
     api.changeLikeCardStatus(card._id, isLiked).then((newCard) => {
@@ -170,7 +172,8 @@ function App() {
     auth.register (email, password)
     .then(result => {
       if (result) {
-        setUserEmail(result.data.email);
+        console.log(result)
+        setUserEmail(result.email);
         setInfoTooltipOpen({ opened: true, success: true })
         setLoggedIn(true);
         history.push('/');

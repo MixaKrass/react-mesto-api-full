@@ -1,4 +1,5 @@
 const { isEmail } = require('validator');
+// eslint-disable-next-line no-unused-vars
 const validator = require('validator');
 const mongoose = require('mongoose');
 
@@ -21,7 +22,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     validate: {
-      validator: (avatar) => validator.isURL(avatar),
+      validator(v) {
+        return /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/.test(v);
+      },
       message: 'Ошибка валидации',
     },
   },
