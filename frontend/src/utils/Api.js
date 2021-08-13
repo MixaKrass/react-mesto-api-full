@@ -1,7 +1,6 @@
 class Api {
-  constructor(confing, {baseUrl} ) {
+  constructor(confing) {
     this._headers = confing.headers
-    this._baseUrl = baseUrl
   }
 
   _checkError(res) {
@@ -94,7 +93,7 @@ class Api {
 }
 
 export default new Api ({
-  baseUrl: `https://mixakras.nomoredomains.club`,
+  baseUrl: `https://api.mixakras.nomoredomains.club`,
   headers: {
     authorization: `Bearer ${localStorage.getItem('token')}`,
     'Content-Type': 'application/json'
