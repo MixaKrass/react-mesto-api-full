@@ -141,13 +141,13 @@ function App() {
 
 
   // проверка токена
-  React.useEffect(() => {
+  useEffect(() => {
     const token = localStorage.getItem('token');
     auth.tokenCheck(token)
     .then(result => {
       if (result) {
         setUserEmail(result.email);
-        setToken({token});
+        setToken(token);
         setLoggedIn(true);
         history.push('/');
         setCurrentPath('/');
@@ -159,7 +159,7 @@ function App() {
       console.log(`Ошибка входа по токену ${err}`);
       history.push('/sign-in');
     })
-  }, [history])
+  }, [])
 
 
   // обработчик завершения
@@ -180,7 +180,6 @@ function App() {
         console.log(result)
         setUserEmail(result.email);
         setInfoTooltipOpen({ opened: true, success: true })
-        setLoggedIn(true);
         history.push('/sign-in');
         setCurrentPath('/sign-in');
       }
