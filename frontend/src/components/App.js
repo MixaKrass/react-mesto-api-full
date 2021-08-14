@@ -18,7 +18,9 @@ import * as auth from "../utils/auth"
 import done from "../images/done.svg";
 import fail from "../images/fail.svg";
 
+
 function App() {
+  const [token, setToken] = React.useState('');
   const [loggedIn, setLoggedIn] = useState(false);
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
@@ -37,29 +39,28 @@ function App() {
  // const done = require('../images/done.svg')
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    api.getUserInfo(token)
-    .then((data) => {
+    if (loggedIn === true) {
+    api.getUserInfo()
+    .then(data => {
       setCurrentUser(data)
     })
-    .catch(e => console.log(e))
-  }, [])
+    .catch(e => console.log(e))}
+  }, [loggedIn])
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    api.getInitialCards(token)
-    .then((data) => {
+    if (loggedIn === true) {
+    api.getInitialCards()
+    .then(data => {
       setCards(data)
     })
-    .catch(err => console.log(err))
-  }, [])
+    .catch(err => console.log(err))}
+  }, [loggedIn])
 
   function handleCardLike(card) {
     // Снова проверяем, есть ли уже лайк на этой карточке
     const isLiked = card.likes.find(i => i === currentUser._id);
-
     // Отправляем запрос в API и получаем обновлённые данные карточки
-    api.changeLikeCardStatus(card._id, isLiked).then((newCard) => {
+    api.changeLikeCardStatus(card._id, isLiked, token).then((newCard) => {
         setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
     })
     .catch(err => console.log(err));
@@ -68,7 +69,7 @@ function App() {
 
     // удаление карточки
     const handleCardDelete = (card) => {
-    api.removeCard(card._id)
+    api.removeCard(card._id, token)
     .then(() => {
       setCards(state => state.filter(c => c._id !== card._id))
    })
@@ -106,7 +107,7 @@ function App() {
 
   // обработчик информации о пользователе
   const handleUpdateUser = (userData) => {
-    api.patchProfileInfo(userData)
+    api.patchProfileInfo(userData, token)
     .then((data) => {
       setCurrentUser(data)
       closeAllPopups()
@@ -116,7 +117,7 @@ function App() {
 
   // обновление аватара
   const handleUpdateAvatar = (newAvatar) => {
-    api.newAvatar(newAvatar)
+    api.newAvatar(newAvatar, token)
     .then((data) => {
       setCurrentUser(data)
       closeAllPopups()
@@ -126,7 +127,7 @@ function App() {
 
 // добавление карточки
   const handleAddPlace = (data) => {
-    api.patchCard(data)
+    api.patchCard(data, token)
     .then(newCard => {
       setCards([newCard, ...cards])
       closeAllPopups()
@@ -138,12 +139,14 @@ function App() {
  }
 
 
-  //проверка токена
+  // проверка токена
   React.useEffect(() => {
-    auth.tokenCheck(localStorage.getItem('token'))
+    const token = localStorage.getItem('token');
+    auth.tokenCheck(token)
     .then(result => {
       if (result) {
         setUserEmail(result.email);
+        setToken({token});
         setLoggedIn(true);
         history.push('/');
         setCurrentPath('/');
@@ -155,12 +158,13 @@ function App() {
       console.log(`Ошибка входа по токену ${err}`);
       history.push('/sign-in');
     })
-  }, [])
+  }, [history])
 
 
   // обработчик завершения
  const handleLogout = () => {
    localStorage.removeItem('token');
+   setToken('');
    setUserEmail('');
    setLoggedIn(false);
    history.push('/sign-in');
@@ -196,6 +200,7 @@ function App() {
       console.log(data)
       if (data.token) {
         localStorage.setItem('token', data.token);
+        setToken(data.token);
         setUserEmail(email);
         setLoggedIn(true);
         history.push('/');

@@ -16,8 +16,8 @@ function Register (props) {
   const handlePathChange = (newPath) => {props.onPathChange(newPath)};
 
   React.useEffect(() => {
-    handlePathChange('/sign-in')
-  }, []);
+    handlePathChange('/sign-up')
+  },);
 
 
   return (

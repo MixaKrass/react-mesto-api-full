@@ -9,7 +9,7 @@ function Login(props) {
 
   React.useEffect(() => {
     handlePathChange('/sign-in')
-  }, []);
+  },);
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);

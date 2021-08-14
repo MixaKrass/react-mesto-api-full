@@ -1,6 +1,5 @@
 class Api {
   constructor(confing) {
-    this._headers = confing.headers
     this._baseUrl= confing.baseUrl
   }
 
@@ -15,7 +14,10 @@ class Api {
   getInitialCards() {
     return fetch(`${this._baseUrl}/cards`, {
       method: 'GET',
-      headers: this._headers
+      headers: {
+        authorization: `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json'
+      }
     })
     .then(this._checkError);
   }
@@ -25,7 +27,10 @@ class Api {
   getUserInfo() {
     return fetch(`${this._baseUrl}/users/me`, {
       method: 'GET',
-      headers: this._headers
+      headers: {
+        authorization: `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json'
+      }
     })
     .then(this._checkError);
   }
@@ -34,7 +39,10 @@ class Api {
   newAvatar(avatarUrl) {
     const newConfing = {
       method: 'PATCH',
-      headers: this._headers,
+      headers: {
+        authorization: `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
         avatar: avatarUrl['avatar']
       }),
@@ -47,7 +55,10 @@ class Api {
   // удаляем карточку
   removeCard(cardId) {
     const newConfing = {
-      headers: this._headers,
+      headers: {
+        authorization: `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json'
+      },
       method: 'DELETE',
     }
     return fetch(`${this._baseUrl}/cards/${cardId}`, newConfing)
@@ -57,12 +68,18 @@ class Api {
   // ставим и удаляем лайк
   changeLikeCardStatus(cardId, isLiked) {
     const updateLike = {
-      headers: this._headers,
+      headers: {
+        authorization: `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json'
+      },
       method: 'PUT',
     }
 
     const deleteLike = {
-      headers: this._headers,
+      headers: {
+        authorization: `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json'
+      },
       method: 'DELETE',
     }
     return fetch(`${this._baseUrl}/cards/${cardId}/likes`, isLiked ? deleteLike : updateLike)
@@ -73,7 +90,10 @@ class Api {
   patchProfileInfo(userData) {
     const newConfing = {
       method: 'PATCH',
-      headers: this._headers,
+      headers: {
+        authorization: `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(userData),
     }
     return fetch(`${this._baseUrl}/users/me`, newConfing)
@@ -86,7 +106,10 @@ class Api {
   patchCard(inputsValue) {
     const newConfing = {
       method: 'POST',
-      headers: this._headers,
+      headers: {
+        authorization: `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(inputsValue),
 
   }
@@ -97,8 +120,4 @@ class Api {
 
 export default new Api ({
   baseUrl: `https://api.mixakras.nomoredomains.club`,
-  headers: {
-    authorization: `Bearer ${localStorage.getItem('token')}`,
-    'Content-Type': 'application/json'
-  }
 });
