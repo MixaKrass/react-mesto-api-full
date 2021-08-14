@@ -80,6 +80,8 @@ class Api {
     .then(this._checkError);
   }
 
+
+
   //создание карточки
   patchCard(inputsValue) {
     const newConfing = {

@@ -37,7 +37,7 @@ function App() {
  // const done = require('../images/done.svg')
 
   useEffect(() => {
-    const token = localStorage.getItem('jwt');
+    const token = localStorage.getItem('token');
     api.getUserInfo(token)
     .then((data) => {
       setCurrentUser(data)
@@ -46,7 +46,7 @@ function App() {
   }, [])
 
   useEffect(() => {
-    const token = localStorage.getItem('jwt');
+    const token = localStorage.getItem('token');
     api.getInitialCards(token)
     .then((data) => {
       setCards(data)
