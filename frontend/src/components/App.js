@@ -143,7 +143,7 @@ function App() {
     auth.tokenCheck(localStorage.getItem('token'))
     .then(result => {
       if (result) {
-        setUserEmail(result.data.email);
+        setUserEmail(result.email);
         setLoggedIn(true);
         history.push('/');
         setCurrentPath('/');
@@ -176,8 +176,8 @@ function App() {
         setUserEmail(result.email);
         setInfoTooltipOpen({ opened: true, success: true })
         setLoggedIn(true);
-        history.push('/');
-        setCurrentPath('/');
+        history.push('/sign-in');
+        setCurrentPath('/sign-in');
       }
       else {
         throw new Error('Не удалось пройти регистрацию');
@@ -193,6 +193,7 @@ function App() {
   const handleSigninSubmit = (email, password) => {
     auth.authorization (email, password)
     .then(data => {
+      console.log(data)
       if (data.token) {
         localStorage.setItem('token', data.token);
         setUserEmail(email);

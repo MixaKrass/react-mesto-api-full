@@ -3,7 +3,7 @@ const allowedCors = [
   'http://mixakras.nomoredomains.club',
   'https://api.mixakras.nomoredomains.club',
   'http://api.mixakras.nomoredomains.club',
-  'localhost:3000',
+  'http://localhost:3000',
 ];
 
 // Значение для заголовка Access-Control-Allow-Methods по умолчанию (разрешены все типы запросов)
