@@ -4,17 +4,15 @@ const mongoose = require('mongoose');
 const { celebrate, Joi } = require('celebrate');
 const { errors } = require('celebrate');
 const crypto = require('crypto');
-const cors = require('cors');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
-// const corsHand = require('./middlewares/cors');
+const corsHand = require('./middlewares/cors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const app = express();
 const { PORT = 3000 } = process.env;
 
-// app.use(corsHand);
-app.use(cors());
+app.use(corsHand);
 
 const randomString = crypto
   .randomBytes(16) // сгенерируем случайную последовательность 16 байт (128 бит)
