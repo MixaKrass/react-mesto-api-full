@@ -5,7 +5,7 @@ import {Route, Switch, useHistory} from 'react-router-dom';
 import React, { useState, useEffect } from "react";
 import PopupWithForm from "./PopupWithForm";
 import ImagePopup from "./ImagePopup";
-import api from "../utils/api";
+import api from "../utils/Api";
 import CurrentUserContext from "../contexts/CurrentUserContext";
 import EditProfilePopup from "../components/EditProfilePopup";
 import EditAvatarPopup from "../components/EditAvatarPopup";
