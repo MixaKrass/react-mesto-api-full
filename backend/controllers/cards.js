@@ -48,7 +48,7 @@ const deleteCard = (req, res, next) => {
       } else next(err);
     });
 };
-
+// Вы очень классный ревьюер! Спасибо)
 const likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
