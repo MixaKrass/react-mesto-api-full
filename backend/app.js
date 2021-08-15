@@ -1,6 +1,8 @@
 require('dotenv').config();
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
+const helmet = require('helmet');
 const { celebrate, Joi } = require('celebrate');
 const { errors } = require('celebrate');
 const crypto = require('crypto');
@@ -12,6 +14,12 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const app = express();
 const { PORT = 3000 } = process.env;
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // за 15 минут
+  max: 100,
+});
+
+app.use(limiter);
 app.use(corsHand);
 
 const randomString = crypto
@@ -31,6 +39,7 @@ app.use(requestLogger); // подключаем логгер запросов
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(helmet());
 
 app.get('/crash-test', () => {
   setTimeout(() => {
