@@ -19,7 +19,6 @@ const limiter = rateLimit({
   max: 100,
 });
 
-app.use(limiter);
 app.use(corsHand);
 
 const randomString = crypto
@@ -36,6 +35,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 });
 
 app.use(requestLogger); // подключаем логгер запросов
+app.use(limiter);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
